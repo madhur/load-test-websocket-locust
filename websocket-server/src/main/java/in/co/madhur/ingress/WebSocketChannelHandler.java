@@ -29,7 +29,6 @@ public class WebSocketChannelHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
         try {
-            logger.info("WS message received : {}", message);
             processMessage(session, message);
         } catch (Exception e) {
             logger.error("Exception in onMessage for session {} message {} due to {}", session, message,
@@ -38,15 +37,15 @@ public class WebSocketChannelHandler {
     }
 
     private void processMessage(Session session, String message) {
-        JSONObject json = new JSONObject(message);
-        String messageType = json.optString("type").toLowerCase();
-        processEventsBasedOnMessageType(session, messageType, json);
+        JSONObject jsonMessage = new JSONObject(message);
+        String messageType = jsonMessage.optString("type").toLowerCase();
+        processEventsBasedOnMessageType(session, messageType, jsonMessage);
     }
 
-    private void processEventsBasedOnMessageType(Session session, String messageType, JSONObject json) {
+    private void processEventsBasedOnMessageType(Session session, String messageType, JSONObject jsonMessage) {
         switch (messageType) {
             case "heartbeatreq":
-                SystemFactory.getInstance().getWebSocketMessageHandler().handleHeartBeatMessages(session);
+                SystemFactory.getInstance().getWebSocketMessageHandler().handleHeartBeatMessages(session, jsonMessage);
                 break;
             default:
                 logger.info("Unknown message type received : {}", messageType);

@@ -5,4 +5,6 @@ import lombok.Data;
 @Data
 public class WebSocketBaseMessage {
     private String type;
+    private int userId;
+    private long serverDelay;
 }

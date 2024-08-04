@@ -24,7 +24,7 @@ public class WebSocketServer {
     @PostConstruct
     public void initialize() {
         logger.debug("Initializing WebSocketServerExtension");
-        QueuedThreadPool threadPool = new QueuedThreadPool(100);
+        QueuedThreadPool threadPool = new QueuedThreadPool(5);
         server = new Server(threadPool);
         server.manage(threadPool);
         server.setStopTimeout(5*1000);
@@ -39,14 +39,12 @@ public class WebSocketServer {
             server.setConnectors(new Connector[] { socketConnector });
             disableServerVersionHeader();
             WebSocketHandler webSocketHandler = new WebSocketHandler() {
-
                 @Override
                 public void configure(WebSocketServletFactory webSocketServletFactory) {
                     webSocketServletFactory.register(WebSocketChannelHandler.class);
                     webSocketServletFactory.getExtensionFactory().unregister("permessage-deflate");
                 }
             };
-
             server.setHandler(webSocketHandler);
             server.start();
             isRunning = server.isStarted();
