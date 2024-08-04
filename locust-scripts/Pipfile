@@ -1,0 +1,38 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+blinker = "==1.8.2"
+brotli = "==1.1.0"
+certifi = "==2024.7.4"
+charset-normalizer = "==3.3.2"
+click = "==8.1.7"
+configargparse = "==1.7"
+flask = "==3.0.3"
+flask-cors = "==4.0.1"
+flask-login = "==0.6.3"
+gevent = "==24.2.1"
+geventhttpclient = "==2.3.1"
+greenlet = "==3.0.3"
+idna = "==3.7"
+itsdangerous = "==2.2.0"
+jinja2 = "==3.1.4"
+locust = "==2.30.0"
+markupsafe = "==2.1.5"
+msgpack = "==1.0.8"
+psutil = "==6.0.0"
+pyzmq = "==26.0.3"
+requests = "==2.32.3"
+urllib3 = "==2.2.2"
+websocket-client = "==1.8.0"
+werkzeug = "==3.0.3"
+"zope.event" = "==5.0"
+"zope.interface" = "==6.4.post2"
+ujson = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
