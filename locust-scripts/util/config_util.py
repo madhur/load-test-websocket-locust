@@ -1,6 +1,6 @@
 import configparser
 import os
-import definitions
+from util import definitions
 
 """
 Purpose: Util to manage ini config

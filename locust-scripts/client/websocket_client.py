@@ -4,20 +4,19 @@ import gevent
 import ujson
 import logging
 import json
+from locust import events
 
 heartbeatreq = '{"type":"heartbeatreq","userId":1}'
 
 
 class WebSocketUser(object):
-    def __init__(self, host, port):
-        self.host = host
-        self.port = port
+    def __init__(self):
         self.ws = None
 
     def connect(self, url, user_id):
         start_time = time.time()
         try:
-            
+            print("Connecting to ws", url, user_id)
             self.set_user_id(user_id)
             self.ws = websocket.WebSocketApp(url)
             self.ws.keep_running = False
@@ -27,26 +26,25 @@ class WebSocketUser(object):
             self.ws.on_close = self.on_close
         except websocket.WebSocketTimeoutException as e:
             total_time = int((time.time() - start_time) * 1000)
-            events.request_failure.fire(request_type="web_socket", name='ws', response_time=total_time,
+            events.request.fire(request_type="web_socket", name='ws', response_time=total_time,
                                         exception=e)
         else:
             total_time = int((time.time() - start_time) * 1000)
-            events.request_success.fire(request_type="web_socket", name='ws', response_time=total_time,
+            events.request.fire(request_type="web_socket", name='ws', response_time=total_time,
                                         response_length=0)
+            
+        return self.ws
 
     def on_stop(self):
         self.ws.close()
 
-    def on_message(self, message):
-        print("On message--" + message)
+    def on_message(self, app, arg):
+        print("On message--" , arg)
 
-    def on_open(self):
-        logging.info('Ws connection opened for userId=%s', self.get_user_id())
+    def on_open(self, arg):
+        print('Ws connection opened for userId=%s', self.get_user_id(), arg)
         self.set_heartbeat_gevent(gevent.spawn(self.heartbeat))
 
-    def on_message(self, message):
-        self.ws.send(message)
-        self.ws.recv()
 
     def on_ping(self):
         self.ws.ping()
@@ -54,11 +52,15 @@ class WebSocketUser(object):
     def on_pong(self):
         self.ws.pong()
 
+    def set_heartbeat_gevent(self, heartbeat_gevent):
+        self.heartbeat_gevent = heartbeat_gevent
+
     def heartbeat(self):
         while True:
             heartbeatreq_json_data = ujson.loads(heartbeatreq)
             heartbeatreq_json_data['userId'] = self.get_user_id()
             heartbeatreq_json_string = json.dumps(heartbeatreq_json_data) + "\n"
+            print("Sending heartbeat", heartbeatreq_json_string)
             self.ws.send(heartbeatreq_json_string)
             time.sleep(0.5)
 
@@ -68,8 +70,8 @@ class WebSocketUser(object):
     def set_user_id(self, user_id):
         self.user_id = user_id
 
-    def on_error(self, error):
-        logging.info('ERROR=%s userId=%s', error, self.get_user_id())
+    def on_error(self, error, arg):
+        print("Error--", arg)
 
-    def on_close(self):
-        logging.info('CLOSED userIs=%s', self.get_user_id())
+    def on_close(self, app, close_msg, arg):
+        print('CLOSED userId', self.get_user_id())
