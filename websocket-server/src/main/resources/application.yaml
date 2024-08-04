@@ -1,0 +1,14 @@
+server:
+  port: 9090
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,circuitbreakerevents,circuitbreakers,retries,retryevents,prometheus
+
+  metrics:
+    tags:
+      application: multi_player_connection_service
+    export:
+      prometheus:
+        enabled: true
